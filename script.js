@@ -17,7 +17,7 @@
     memos: [],
     teamMembers: [],
     settings: {
-      apiUrl: 'https://script.google.com/macros/s/AKfycbxJyen7LVudk_XdQBVnNZuqWeG-PZnNzZK2hW0zn5ItYWN_suEnLgPDpzFL2aTGVWY/exec',
+      apiUrl: 'https://script.google.com/macros/s/AKfycbyt-5UPWqBAlt0gLx-ihmf26X3x4cgS4cuo5YGM6xfBE7xex2DqtpHoSJY4Qn6h_YV7aw/exec',
       shop_name: 'RAVO HOUSE',
       shop_logo: '',
       shop_tagline: 'Luxury & Lifestyle Management',
@@ -264,7 +264,7 @@
         if (storedSettings) AppState.settings = Object.assign({}, AppState.settings, JSON.parse(storedSettings));
 
         if (!AppState.settings.apiUrl) {
-          AppState.settings.apiUrl = 'https://script.google.com/macros/s/AKfycbxJyen7LVudk_XdQBVnNZuqWeG-PZnNzZK2hW0zn5ItYWN_suEnLgPDpzFL2aTGVWY/exec';
+          AppState.settings.apiUrl = 'https://script.google.com/macros/s/AKfycbyt-5UPWqBAlt0gLx-ihmf26X3x4cgS4cuo5YGM6xfBE7xex2DqtpHoSJY4Qn6h_YV7aw/exec';
         }
 
         const storedAuth = sessionStorage.getItem('ravo_auth_user') || localStorage.getItem('ravo_auth_user');
