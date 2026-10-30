@@ -1,0 +1,2992 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAVO HOUSE | Luxury Product & Order Memo Management</title>
+    <meta
+      name="description"
+      content="Exclusive business management portal for RAVO HOUSE Bangladesh - Product catalog, dynamic order memo generation, profit analytics, and Google Sheets integration."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dist/output.css" />
+    <link rel="icon" href="src/image/logo.png" />
+  </head>
+  <body
+    class="bg-navy-900 text-slate-100 font-sans min-h-screen antialiased selection:bg-gold-500 selection:text-navy-950"
+  >
+    <!-- Full-Screen Login Gatekeeper View (Shown exclusively before authentication) -->
+    <div
+      id="loginScreenView"
+      class="fixed inset-0 bg-navy-950 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.12)_0%,transparent_60%),radial-gradient(circle_at_10%_80%,rgba(15,23,42,0.9)_0%,transparent_50%),radial-gradient(circle_at_90%_80%,rgba(30,41,59,0.7)_0%,transparent_50%)] z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+    >
+      <div
+        class="w-full max-w-md bg-navy-800/90 backdrop-blur-xl border border-gold-border rounded-2xl p-6 sm:p-8 shadow-modal text-center relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[3px] before:bg-gradient-to-r before:from-transparent before:via-gold-500 before:to-transparent"
+      >
+        <img
+          id="loginLogoImg"
+          data-branding="logo"
+          class="w-24 h-24 mx-auto rounded-full object-contain bg-navy-900 border border-gold-border/40 p-1"
+          src="src/image/logo.png"
+          alt="Brand Logo"
+        />
+
+        <h2
+          id="loginBrandTitle"
+          data-branding="name"
+          class="font-serif text-2xl font-bold text-gold-100 tracking-wider uppercase mb-1 mt-4"
+        >
+          RAVO HOUSE
+        </h2>
+        <p
+          class="text-xs text-slate-400 uppercase tracking-widest font-medium mb-6"
+        >
+          Exclusive Management Portal &bull; Bangladesh
+        </p>
+
+        <form
+          id="mainLoginForm"
+          onsubmit="
+            event.preventDefault();
+            App.submitLogin();
+          "
+          class="text-left space-y-4"
+        >
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="loginEmail"
+              >Email Address</label
+            >
+            <input
+              type="email"
+              id="loginEmail"
+              placeholder="user@ravohouse.com"
+              required
+              autocomplete="username"
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="loginPassword"
+              >Password</label
+            >
+            <input
+              type="password"
+              id="loginPassword"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+
+          <div class="pt-2">
+            <button
+              type="submit"
+              id="loginSubmitBtn"
+              class="w-full py-3 px-4 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer disabled:opacity-50"
+            >
+              Sign In to Dashboard
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Protected Application Container (Only shown after verified authentication) -->
+    <div id="appMainContainer" class="hidden flex-col min-h-screen">
+      <!-- Top Header Bar -->
+      <header
+        class="sticky top-0 z-40 bg-navy-800/85 backdrop-blur-md border-b border-navy-border px-4 sm:px-6 py-3 flex items-center justify-between"
+      >
+        <div
+          id="brandLogoBtn"
+          onclick="App.navigateTo('dashboard')"
+          class="flex items-center gap-3 cursor-pointer group"
+        >
+          <img
+            id="headerLogoImg"
+            data-branding="logo"
+            class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-contain bg-navy-900 border border-gold-border/30 p-0.5"
+            src="src/image/logo.png"
+            alt="Brand Logo"
+          />
+          <div>
+            <h1
+              id="headerBrandTitle"
+              data-branding="name"
+              class="font-serif text-lg sm:text-xl font-bold tracking-widest text-gold-500 uppercase leading-none"
+            >
+              RAVO HOUSE
+            </h1>
+            <span
+              class="text-[10px] text-slate-400 tracking-[0.18em] uppercase font-medium mt-0.5 block"
+              >Management Portal &bull; BD</span
+            >
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-4">
+          <!-- Live Connection Indicator Pill -->
+          <div
+            id="connectionStatusPill"
+            onclick="App.openSettingsModal()"
+            class="connection-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-navy-700 border border-navy-border transition-all cursor-pointer disconnected"
+            title="Click to check Google Apps Script backend status"
+          >
+            <span
+              class="status-dot w-2 h-2 rounded-full bg-current shadow-[0_0_8px_currentColor]"
+            ></span>
+            <span id="connectionStatusText">Checking Backend...</span>
+          </div>
+
+          <!-- Current User Profile Pill -->
+          <div
+            id="userProfileBadge"
+            class="hidden sm:flex items-center gap-2.5 px-3 py-1 bg-navy-600 border border-gold-border rounded-full text-xs"
+          >
+            <div
+              id="userAvatarChar"
+              class="w-6 h-6 rounded-full bg-gold-dim text-gold-500 flex items-center justify-center font-bold text-xs"
+            >
+              A
+            </div>
+            <div class="flex flex-col">
+              <span
+                id="userNameDisplay"
+                class="font-semibold text-slate-100 leading-none"
+                >Admin</span
+              >
+              <span
+                id="userRoleDisplay"
+                class="text-[10px] text-gold-500 uppercase tracking-wider mt-0.5"
+                >Administrator</span
+              >
+            </div>
+          </div>
+
+          <!-- Auth & Security Action Buttons -->
+          <div class="flex items-center gap-2">
+            <button
+              id="headerChangePassBtn"
+              onclick="App.openChangePasswordModal()"
+              title="Change Password"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-navy-700/80 hover:bg-navy-600 text-slate-200 border border-navy-border hover:border-gold-500/50 hover:text-gold-300 transition-all cursor-pointer"
+            >
+              <svg
+                class="w-3.5 h-3.5 text-gold-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                />
+              </svg>
+              <span class="hidden sm:inline">Password</span>
+            </button>
+            <button
+              id="authBtn"
+              onclick="App.handleAuthClick()"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-navy-600 hover:bg-navy-700 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all cursor-pointer"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+                />
+              </svg>
+              <span id="authBtnText">Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Navigation Tabs Bar -->
+      <nav
+        class="bg-navy-800 border-b border-navy-border px-4 sm:px-6 flex items-center overflow-x-auto scrollbar-none"
+      >
+        <ul id="navTabsList" class="flex flex-wrap gap-1">
+          <li>
+            <button
+              data-tab="dashboard"
+              onclick="App.navigateTo('dashboard')"
+              class="nav-tab-btn active flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+                />
+              </svg>
+              Dashboard
+            </button>
+          </li>
+          <li>
+            <button
+              data-tab="products"
+              onclick="App.navigateTo('products')"
+              class="nav-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
+                />
+              </svg>
+              Products
+            </button>
+          </li>
+          <li>
+            <button
+              data-tab="createMemo"
+              onclick="App.navigateTo('createMemo')"
+              class="nav-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+              Create Memo
+            </button>
+          </li>
+          <li>
+            <button
+              data-tab="memos"
+              onclick="App.navigateTo('memos')"
+              class="nav-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                />
+              </svg>
+              Order Memos
+            </button>
+          </li>
+          <li id="categoriesNavTab">
+            <button
+              data-tab="categories"
+              onclick="App.navigateTo('categories')"
+              class="nav-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.386l5.424-3.187c.827-.486 1.144-1.53.714-2.348l-4.596-8.736A2.25 2.25 0 0015.409 3H9.568z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 6h.008v.008H6V6z"
+                />
+              </svg>
+              Categories
+            </button>
+          </li>
+          <li id="teamNavTab">
+            <button
+              data-tab="team"
+              onclick="App.navigateTo('team')"
+              class="nav-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+                />
+              </svg>
+              Team
+            </button>
+          </li>
+          <li id="settingsNavTab">
+            <button
+              data-tab="settings"
+              onclick="App.navigateTo('settings')"
+              class="nav-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-gold-200 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer [&.active]:text-gold-500 [&.active]:border-gold-500 [&.active]:bg-gradient-to-b [&.active]:from-gold-500/10 [&.active]:to-transparent"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Settings
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 p-4 sm:p-6 max-w-7xl mx-auto w-full">
+        <!-- ===================================================================
+           TAB: DASHBOARD
+           =================================================================== -->
+        <section
+          id="pane-dashboard"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300 active"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                Executive Dashboard
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Real-time analytics, inventory valuation, and sales metrics
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                onclick="App.syncFromCloud()"
+                class="inline-flex items-center gap-1.5 font-semibold px-3.5 py-2 rounded-lg text-xs sm:text-sm bg-navy-600 hover:bg-navy-700 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all cursor-pointer"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+                Sync Sheets
+              </button>
+              <button
+                onclick="App.navigateTo('createMemo')"
+                class="inline-flex items-center gap-1.5 font-semibold px-3.5 py-2 rounded-lg text-xs sm:text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+                New Order Memo
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KPI Cards -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6"
+          >
+            <!-- Total Products -->
+            <div
+              class="bg-navy-700 border border-gold-cardBorder hover:border-gold-500 rounded-xl p-5 shadow-card hover:shadow-gold-glow hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-gold-500 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span
+                  class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                  >Catalog Products</span
+                >
+                <div
+                  class="w-9 h-9 rounded-lg flex items-center justify-center bg-gold-dim text-gold-500"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                id="kpiTotalProducts"
+                class="text-2xl sm:text-3xl font-bold text-slate-100 leading-tight"
+              >
+                0
+              </div>
+              <div id="kpiCategoriesCount" class="text-xs text-slate-400 mt-1">
+                Across 0 categories
+              </div>
+            </div>
+
+            <!-- Total Memos -->
+            <div
+              class="bg-navy-700 border border-gold-cardBorder hover:border-gold-500 rounded-xl p-5 shadow-card hover:shadow-gold-glow hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-gold-500 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span
+                  class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                  >Total Orders</span
+                >
+                <div
+                  class="w-9 h-9 rounded-lg flex items-center justify-center bg-gold-dim text-gold-500"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                id="kpiTotalMemos"
+                class="text-2xl sm:text-3xl font-bold text-slate-100 leading-tight"
+              >
+                0
+              </div>
+              <div id="kpiDeliveredMemos" class="text-xs text-slate-400 mt-1">
+                0 delivered
+              </div>
+            </div>
+
+            <!-- Total Sales (BDT) -->
+            <div
+              class="bg-navy-700 border border-gold-cardBorder hover:border-gold-500 rounded-xl p-5 shadow-card hover:shadow-gold-glow hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-gold-500 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span
+                  class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                  >Gross Revenue</span
+                >
+                <div
+                  class="w-9 h-9 rounded-lg flex items-center justify-center bg-gold-dim text-gold-500"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                id="kpiTotalSales"
+                class="text-2xl sm:text-3xl font-bold text-gold-200 leading-tight"
+              >
+                ৳ 0
+              </div>
+              <div id="kpiAvgOrderVal" class="text-xs text-emerald-400 mt-1">
+                Avg order: ৳ 0
+              </div>
+            </div>
+
+            <!-- Estimated Profit (Admin only) -->
+            <div
+              id="kpiProfitCard"
+              class="bg-navy-700 border border-gold-cardBorder hover:border-gold-500 rounded-xl p-5 shadow-card hover:shadow-gold-glow hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-gold-500 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span
+                  class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                  >Estimated Net Profit</span
+                >
+                <div
+                  class="w-9 h-9 rounded-lg flex items-center justify-center bg-emerald-500/15 text-emerald-400"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                id="kpiTotalProfit"
+                class="text-2xl sm:text-3xl font-bold text-emerald-400 leading-tight"
+              >
+                ৳ 0
+              </div>
+              <div id="kpiProfitMargin" class="text-xs text-emerald-400 mt-1">
+                Margin: 0%
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Strip -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-4 p-4 mb-6 bg-navy-800 border border-navy-border rounded-xl shadow-card"
+          >
+            <div
+              class="flex items-center gap-2 font-semibold text-gold-200 text-sm"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+                />
+              </svg>
+              <span>Quick Operations</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button
+                onclick="App.openAddProductModal()"
+                class="admin-only inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all cursor-pointer"
+              >
+                + Add New Product
+              </button>
+              <button
+                onclick="App.navigateTo('createMemo')"
+                class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all cursor-pointer"
+              >
+                + Create Order Memo
+              </button>
+              <button
+                onclick="App.openCategoryModal()"
+                class="admin-only inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all cursor-pointer"
+              >
+                + Add Category
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Customer Memos Section -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-4 mb-4 mt-8"
+          >
+            <div>
+              <h2 class="font-serif text-xl font-bold text-gold-100">
+                Recent Customer Memos
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Latest orders created for dispatch and billing
+              </p>
+            </div>
+            <button
+              onclick="App.navigateTo('memos')"
+              class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all cursor-pointer"
+            >
+              View All Memos &rarr;
+            </button>
+          </div>
+
+          <div
+            class="bg-navy-800 border border-navy-border rounded-xl overflow-hidden shadow-card"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr
+                    class="bg-navy-850 border-b border-navy-border text-gold-200 text-xs font-semibold uppercase tracking-wider"
+                  >
+                    <th class="py-3 px-4">Memo #</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Customer</th>
+                    <th class="py-3 px-4">Phone</th>
+                    <th class="py-3 px-4">Zone</th>
+                    <th class="py-3 px-4">Grand Total</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="dashboardRecentMemosBody"
+                  class="divide-y divide-navy-border/40 text-slate-300"
+                >
+                  <tr>
+                    <td colspan="8" class="text-center text-slate-500 py-8">
+                      Loading recent memos...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+           TAB: PRODUCTS
+           =================================================================== -->
+        <section
+          id="pane-products"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                Product Catalog
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Manage product pricing, packaging expenses, and Cloudinary
+                imagery
+              </p>
+            </div>
+            <button
+              id="btnAddProductHeader"
+              onclick="App.openAddProductModal()"
+              class="admin-only inline-flex items-center gap-2 font-semibold px-4 py-2.5 rounded-lg text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+              Add Product
+            </button>
+          </div>
+
+          <!-- Search and Category Filters -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-4 p-4 mb-6 bg-navy-800 border border-navy-border rounded-xl shadow-card"
+          >
+            <div class="relative w-full sm:w-80">
+              <svg
+                class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+              <input
+                type="text"
+                id="productSearchInput"
+                placeholder="Search by name, ID or category..."
+                oninput="App.handleProductSearch()"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg pl-10 pr-4 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+              />
+            </div>
+
+            <div id="productCategoryPills" class="flex flex-wrap gap-2">
+              <button
+                onclick="App.filterProductsByCategory('all')"
+                class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer border bg-gold-500 text-navy-950 font-bold border-gold-300 shadow-gold-sm"
+              >
+                All Products
+              </button>
+            </div>
+          </div>
+
+          <!-- Products Cards Grid -->
+          <div
+            id="productsGridContainer"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
+          >
+            <!-- Dynamically Populated Cards -->
+          </div>
+        </section>
+
+        <!-- ===================================================================
+           TAB: CREATE ORDER MEMO (POS DESK)
+           =================================================================== -->
+        <section
+          id="pane-createMemo"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                Create Customer Order Memo
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Generate unique memos, configure delivery charges, and print
+                official invoices
+              </p>
+            </div>
+            <button
+              onclick="App.resetMemoForm()"
+              class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-navy-600 hover:bg-navy-700 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all cursor-pointer"
+            >
+              Clear Form
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Column: Form & Items -->
+            <div
+              class="lg:col-span-8 bg-navy-800 border border-navy-border rounded-xl p-5 sm:p-6 shadow-card space-y-6"
+            >
+              <!-- Customer Details Group -->
+              <div>
+                <div
+                  class="flex items-center gap-2 text-gold-200 font-semibold text-sm mb-4 pb-2 border-b border-navy-border"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    />
+                  </svg>
+                  Customer & Delivery Information
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                      for="memoCustomerName"
+                      >Customer Name <span class="text-rose-400">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="memoCustomerName"
+                      placeholder="e.g. Tanvir Hossain"
+                      required
+                      class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                      for="memoCustomerPhone"
+                      >Phone Number <span class="text-rose-400">*</span></label
+                    >
+                    <input
+                      type="tel"
+                      id="memoCustomerPhone"
+                      placeholder="017XXXXXXXX"
+                      required
+                      maxlength="11"
+                      minlength="11"
+                      pattern="^01[0-9]{9}$"
+                      autocomplete="tel"
+                      inputmode="numeric"
+                      class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                    />
+                    <p
+                      id="memoCustomerPhoneError"
+                      class="hidden text-rose-400 text-xs mt-1.5 flex items-center gap-1"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                      <span id="memoCustomerPhoneErrorText"></span>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <label
+                    class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                    for="memoCustomerAddress"
+                    >Full Delivery Address
+                    <span class="text-rose-400">*</span></label
+                  >
+                  <textarea
+                    id="memoCustomerAddress"
+                    rows="2"
+                    placeholder="House, Road, Area, Dhaka / District"
+                    required
+                    class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                  ></textarea>
+                </div>
+
+                <!-- Order Notes / Description (Optional) -->
+                <div class="mt-4">
+                  <label
+                    class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                    for="memoOrderNotes"
+                    >Order Description / Notes (Optional)</label
+                  >
+                  <textarea
+                    id="memoOrderNotes"
+                    rows="2"
+                    placeholder="Product Description"
+                    oninput="App.handleMemoNotesChange()"
+                    class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                  ></textarea>
+                </div>
+
+                <!-- Delivery Zone Selector -->
+                <div class="mt-4">
+                  <label
+                    class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                    >Delivery Zone <span class="text-rose-400">*</span></label
+                  >
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label
+                      id="zoneInsideDhakaCard"
+                      class="zone-option-card border border-navy-border rounded-xl p-4 cursor-pointer transition-all hover:border-gold-border flex items-center gap-3 bg-navy-700/60 [&.selected]:border-gold-500 [&.selected]:bg-gold-dim/20 [&.selected]:shadow-gold-sm selected"
+                    >
+                      <input
+                        type="radio"
+                        name="deliveryZone"
+                        value="inside"
+                        class="sr-only"
+                        checked
+                        onchange="App.handleZoneChange('inside')"
+                      />
+                      <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-slate-100">
+                          Inside Dhaka
+                        </h4>
+                        <p
+                          id="zoneInsideLabelPrice"
+                          class="text-gold-200 text-xs font-bold mt-0.5"
+                        >
+                          ৳ 60
+                        </p>
+                      </div>
+                    </label>
+                    <label
+                      id="zoneOutsideDhakaCard"
+                      class="zone-option-card border border-navy-border rounded-xl p-4 cursor-pointer transition-all hover:border-gold-border flex items-center gap-3 bg-navy-700/60 [&.selected]:border-gold-500 [&.selected]:bg-gold-dim/20 [&.selected]:shadow-gold-sm"
+                    >
+                      <input
+                        type="radio"
+                        name="deliveryZone"
+                        value="outside"
+                        class="sr-only"
+                        onchange="App.handleZoneChange('outside')"
+                      />
+                      <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-slate-100">
+                          Outside Dhaka
+                        </h4>
+                        <p
+                          id="zoneOutsideLabelPrice"
+                          class="text-gold-200 text-xs font-bold mt-0.5"
+                        >
+                          ৳ 130
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Line Items Selector Section -->
+              <div class="pt-4 border-t border-navy-border">
+                <div
+                  class="flex items-center gap-2 text-gold-200 font-semibold text-sm mb-3.5 pb-2 border-b border-navy-border"
+                >
+                  <svg
+                    class="w-5 h-5 text-gold-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119.993z"
+                    />
+                  </svg>
+                  <span>Ordered Products</span>
+                </div>
+
+                <!-- Product Search & Quick Add Bar -->
+                <div class="relative my-3.5 mt-4">
+                  <div class="relative flex items-center">
+                    <svg
+                      class="w-4 h-4 text-gold-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                      />
+                    </svg>
+                    <input
+                      type="text"
+                      id="memoProductSearchInput"
+                      placeholder="Search product by name, SKU, or category to add to memo..."
+                      autocomplete="off"
+                      oninput="App.handleMemoProductSearch(this.value)"
+                      onfocus="App.handleMemoProductSearch(this.value)"
+                      onkeydown="App.handleMemoProductSearchKeydown(event)"
+                      class="w-full bg-navy-700/90 border border-gold-border/40 focus:border-gold-500 rounded-xl pl-10 pr-10 py-2.5 text-slate-100 placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold-500/20 shadow-sm transition-all"
+                      style="
+                        background-color: #152037;
+                        color-scheme: dark;
+                        padding-left: 2.6rem;
+                        padding-right: 2.5rem;
+                      "
+                    />
+                    <button
+                      type="button"
+                      id="memoProductSearchClearBtn"
+                      onclick="App.clearMemoProductSearch()"
+                      class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-gold-300 cursor-pointer"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Dropdown Search Results -->
+                  <div
+                    id="memoProductSearchResults"
+                    class="hidden absolute left-0 right-0 top-full mt-1.5 bg-navy-800 border border-gold-border rounded-xl shadow-modal z-50 max-h-72 overflow-y-auto divide-y divide-navy-border/40 backdrop-blur-xl"
+                    style="
+                      background-color: #0f172a;
+                      box-shadow:
+                        0 16px 40px rgba(0, 0, 0, 0.7),
+                        0 0 20px rgba(212, 175, 55, 0.2);
+                      border: 1px solid rgba(212, 175, 55, 0.35);
+                    "
+                  ></div>
+                </div>
+
+                <div
+                  class="bg-navy-800 border border-navy-border rounded-xl overflow-hidden shadow-sm mt-6"
+                >
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                      <thead>
+                        <tr
+                          class="bg-navy-850 border-b border-navy-border text-gold-200 text-xs uppercase font-semibold"
+                        >
+                          <th class="py-2.5 px-3 w-5/12">Product</th>
+                          <th class="py-2.5 px-3 w-2/12">Price (৳)</th>
+                          <th class="py-2.5 px-3 w-2/12 text-center">Qty</th>
+                          <th class="py-2.5 px-3 w-2/12 text-right">
+                            Total (৳)
+                          </th>
+                          <th class="py-2.5 px-2 w-1/12 text-center"></th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        id="memoItemsTableBody"
+                        class="divide-y divide-navy-border/50 text-slate-300"
+                      >
+                        <!-- Dynamic Item Rows -->
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div
+                    class="p-3 bg-navy-800/80 flex items-center justify-between border-t border-navy-border text-xs"
+                  >
+                    <span
+                      class="text-slate-400 text-[11px] flex items-center gap-1.5"
+                    >
+                      <svg
+                        class="w-3.5 h-3.5 text-gold-400/80"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      Search products above to add to memo
+                    </span>
+                    <span
+                      id="memoItemsCountIndicator"
+                      class="text-xs font-semibold text-gold-300"
+                      >0 Products (0 units)</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Order Summary & Receipt -->
+            <div
+              class="lg:col-span-4 bg-navy-700 border border-gold-border/40 rounded-xl p-5 sticky top-20 shadow-card flex flex-col justify-between"
+            >
+              <div>
+                <div
+                  class="flex items-center justify-between pb-4 mb-4 border-b border-navy-border"
+                >
+                  <div>
+                    <h3 class="font-serif text-lg font-bold text-gold-100">
+                      Order Memo
+                    </h3>
+                    <span class="text-xs text-slate-400"
+                      ><span data-branding="name">RAVO HOUSE</span>
+                      Billing</span
+                    >
+                  </div>
+                  <div
+                    id="generatedMemoIdDisplay"
+                    class="px-2.5 py-1 rounded-full text-xs font-bold bg-gold-dim text-gold-300 border border-gold-border"
+                  >
+                    RH-AUTO
+                  </div>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between items-center text-slate-300">
+                    <span>Subtotal</span>
+                    <span
+                      id="summarySubtotalDisplay"
+                      class="font-bold text-slate-100"
+                      >৳ 0</span
+                    >
+                  </div>
+
+                  <div class="flex justify-between items-center text-slate-300">
+                    <span>Delivery Charge</span>
+                    <div class="flex items-center gap-2">
+                      <span
+                        id="summaryDeliveryDisplay"
+                        class="font-bold text-slate-100"
+                        >৳ 60</span
+                      >
+                      <input
+                        type="number"
+                        id="memoDeliveryCustomOverride"
+                        class="hidden w-16 bg-navy-800 border border-navy-border rounded px-2 py-0.5 text-xs text-slate-100"
+                        oninput="App.handleCustomDeliveryOverride()"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex justify-between items-center text-slate-300">
+                    <span>Discount / Advance</span>
+                    <input
+                      type="number"
+                      id="memoDiscountInput"
+                      value="0"
+                      min="0"
+                      oninput="App.recalculateMemoTotals()"
+                      class="w-24 bg-navy-800 border border-navy-border focus:border-gold-500 rounded px-2.5 py-1 text-right text-xs text-slate-100 focus:outline-none"
+                    />
+                  </div>
+
+                  <div
+                    class="pt-3 border-t border-dashed border-gold-border/60 flex justify-between items-center"
+                  >
+                    <span class="font-bold text-base text-gold-100"
+                      >Grand Total</span
+                    >
+                    <span
+                      id="summaryGrandTotalDisplay"
+                      class="font-bold text-xl text-gold-400"
+                      >৳ 60</span
+                    >
+                  </div>
+
+                  <!-- Order Notes / Description Live Preview with Copy Button -->
+                  <div
+                    id="summaryOrderNotesBox"
+                    class="hidden mt-3 p-2.5 bg-navy-800/80 border border-navy-border/60 rounded-lg text-xs"
+                  >
+                    <div
+                      class="flex items-center justify-between text-slate-400 mb-1"
+                    >
+                      <span
+                        class="font-semibold text-gold-300 text-[11px] flex items-center gap-1"
+                      >
+                        <svg
+                          class="w-3 h-3 text-gold-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                        Order Description / Note
+                      </span>
+                      <button
+                        type="button"
+                        onclick="App.copyOrderDescription(this)"
+                        class="px-2 py-0.5 rounded text-[10px] font-semibold bg-gold-dim hover:bg-gold-500 text-gold-200 hover:text-navy-950 border border-gold-border hover:border-gold-500 transition-all cursor-pointer shadow-sm active:scale-95 flex items-center gap-1"
+                        title="Copy order note text"
+                      >
+                        <svg
+                          class="w-2.5 h-2.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Copy
+                      </button>
+                    </div>
+                    <p
+                      id="summaryOrderNotesDisplay"
+                      class="text-slate-300 text-xs italic break-words"
+                    ></p>
+                  </div>
+                </div>
+
+                <!-- Profit Calculation (Visible to Admin only) -->
+                <div
+                  id="summaryProfitPanel"
+                  class="mt-5 p-3.5 bg-navy-800/80 border border-emerald-500/30 rounded-lg text-xs space-y-1.5 flex flex-col"
+                >
+                  <div
+                    class="flex items-center justify-between text-emerald-300 font-semibold mb-1"
+                  >
+                    <span>Order Cost & Profit Analysis</span>
+                    <svg
+                      class="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex justify-between text-slate-400">
+                    <span>Total Product Cost:</span>
+                    <span id="summaryTotalCostDisplay" class="text-slate-200"
+                      >৳ 0</span
+                    >
+                  </div>
+                  <div
+                    class="flex justify-between text-emerald-400 font-bold pt-1 border-t border-emerald-500/20"
+                  >
+                    <span>Estimated Net Profit:</span>
+                    <span id="summaryNetProfitDisplay">৳ 0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2.5 mt-6 pt-4 border-t border-navy-border">
+                <button
+                  id="btnSaveAndPrint"
+                  onclick="App.submitMemo(true)"
+                  class="w-full py-3 px-4 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6.72 13.829c-.24-1.056-.37-2.16-.37-3.294 0-4.664 3.42-8.47 7.747-8.535 4.34-.065 7.903 3.68 7.903 8.355 0 1.157-.135 2.284-.383 3.363M6.72 13.829a8.96 8.96 0 00-2.22 5.671h14.998c-.463-2.062-1.378-3.93-2.617-5.463M6.72 13.829L9 16.5m0 0l3-3m-3 3l-3-3m12 0l-3 3m3-3l3 3"
+                    />
+                  </svg>
+                  Save Memo & Print Invoice
+                </button>
+
+                <button
+                  id="btnSaveOnly"
+                  onclick="App.submitMemo(false)"
+                  class="w-full py-2.5 px-4 rounded-lg font-semibold text-sm bg-navy-600 hover:bg-navy-500 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4.5 12.75l6 6 9-13.5"
+                    />
+                  </svg>
+                  Save to Google Sheets
+                </button>
+
+                <button
+                  id="btnCopyMemo"
+                  type="button"
+                  onclick="App.copyCurrentDraftMemo()"
+                  class="w-full py-2.5 px-4 rounded-lg font-semibold text-sm bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Copy Memo Text (WhatsApp / FB)
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+           TAB: ORDER MEMOS (HISTORY)
+           =================================================================== -->
+        <section
+          id="pane-memos"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                Order Memo Records
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Access, track, filter, and re-print customer invoices
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                onclick="App.syncFromCloud()"
+                class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-navy-600 hover:bg-navy-700 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all cursor-pointer"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+                Refresh
+              </button>
+              <button
+                onclick="App.navigateTo('createMemo')"
+                class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md transition-all cursor-pointer"
+              >
+                + New Memo
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="flex flex-wrap items-center justify-between gap-4 p-4 mb-6 bg-navy-800 border border-navy-border rounded-xl shadow-card"
+          >
+            <div class="relative flex-1 min-w-[260px]">
+              <svg
+                class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+              <input
+                type="text"
+                id="memoSearchInput"
+                placeholder="Search by Memo #, customer name, or phone number..."
+                oninput="App.handleMemoSearch()"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg pl-10 pr-4 py-2 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+              />
+            </div>
+
+            <div>
+              <select
+                id="memoStatusFilter"
+                onchange="App.handleMemoSearch()"
+                class="bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3 py-2 text-slate-100 text-sm focus:outline-none transition-all cursor-pointer"
+                style="background-color: #152037; color-scheme: dark"
+              >
+                <option
+                  class="bg-navy-900 text-slate-100"
+                  style="background-color: #0b1120; color: #f1f5f9"
+                  value="all"
+                >
+                  All Statuses
+                </option>
+                <option
+                  class="bg-navy-900 text-amber-400"
+                  style="background-color: #0b1120; color: #fbbf24"
+                  value="Pending"
+                >
+                  Pending
+                </option>
+                <option
+                  class="bg-navy-900 text-gold-300"
+                  style="background-color: #0b1120; color: #eed482"
+                  value="Confirmed"
+                >
+                  Confirmed
+                </option>
+                <option
+                  class="bg-navy-900 text-sky-300"
+                  style="background-color: #0b1120; color: #7dd3fc"
+                  value="Shipped"
+                >
+                  Shipped
+                </option>
+                <option
+                  class="bg-navy-900 text-emerald-400"
+                  style="background-color: #0b1120; color: #34d399"
+                  value="Delivered"
+                >
+                  Delivered
+                </option>
+                <option
+                  class="bg-navy-900 text-rose-400"
+                  style="background-color: #0b1120; color: #fb7185"
+                  value="Cancelled"
+                >
+                  Cancelled
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="bg-navy-800 border border-navy-border rounded-xl overflow-hidden shadow-card"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr
+                    class="bg-navy-850 border-b border-navy-border text-gold-200 text-xs font-semibold uppercase tracking-wider"
+                  >
+                    <th class="py-3 px-4">Memo ID</th>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3 px-4">Customer</th>
+                    <th class="py-3 px-4">Phone</th>
+                    <th class="py-3 px-4">Address</th>
+                    <th class="py-3 px-4">Total (৳)</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="memosTableBody"
+                  class="divide-y divide-navy-border/40 text-slate-300"
+                >
+                  <!-- Dynamically Populated Memos -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+           TAB: CATEGORIES
+           =================================================================== -->
+        <section
+          id="pane-categories"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                Product Categories
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Organize products for streamlined navigation and reports
+              </p>
+            </div>
+            <button
+              onclick="App.openCategoryModal()"
+              class="inline-flex items-center gap-2 font-semibold px-4 py-2.5 rounded-lg text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+              Add Category
+            </button>
+          </div>
+
+          <div
+            id="categoriesGridContainer"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"
+          >
+            <!-- Dynamically populated categories -->
+          </div>
+        </section>
+
+        <!-- ===================================================================
+           TAB: TEAM MANAGEMENT (ADMIN ONLY)
+           =================================================================== -->
+        <section
+          id="pane-team"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                Team & Access Control
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Manage administrator privileges and sales staff access
+              </p>
+            </div>
+            <button
+              onclick="App.openTeamMemberModal()"
+              class="inline-flex items-center gap-2 font-semibold px-4 py-2.5 rounded-lg text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.765z"
+                />
+              </svg>
+              Add Team Member
+            </button>
+          </div>
+
+          <div
+            class="bg-navy-800 border border-navy-border rounded-xl overflow-hidden shadow-card"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr
+                    class="bg-navy-850 border-b border-navy-border text-gold-200 text-xs font-semibold uppercase tracking-wider"
+                  >
+                    <th class="py-3 px-4">ID</th>
+                    <th class="py-3 px-4">Full Name</th>
+                    <th class="py-3 px-4">Email Address</th>
+                    <th class="py-3 px-4">Role</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4">Created</th>
+                    <th class="py-3 px-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="teamTableBody"
+                  class="divide-y divide-navy-border/40 text-slate-300"
+                >
+                  <!-- Dynamically populated team members -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+           TAB: SETTINGS
+           =================================================================== -->
+        <section
+          id="pane-settings"
+          class="tab-pane hidden [&.active]:block transition-opacity duration-300"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-gold-100">
+                System Settings & Database
+              </h2>
+              <p class="text-sm text-slate-400 mt-0.5">
+                Google Apps Script API endpoint, delivery rates, and business
+                information
+              </p>
+            </div>
+            <button
+              onclick="App.saveSettings()"
+              class="inline-flex items-center gap-2 font-semibold px-4 py-2.5 rounded-lg text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              Save Settings
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- =======================================================
+               WEBSITE BRANDING & IDENTITY MANAGEMENT (Admin Only)
+               Dynamic Website Name, Logo Upload, Preview & Persistence
+               ======================================================= -->
+            <div
+              class="col-span-full bg-navy-800 border border-gold-border/60 rounded-xl p-5 sm:p-6 shadow-card space-y-6 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-gold-500 before:to-transparent"
+            >
+              <div
+                class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-navy-border"
+              >
+                <div>
+                  <h3
+                    class="font-serif text-lg font-bold text-gold-100 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-5 h-5 text-gold-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                      />
+                    </svg>
+                    Website Branding & Identity Management
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">
+                    Configure your official website name and logo. Updates the
+                    header, login screen, dashboard, invoice preview, and
+                    printed memos.
+                  </p>
+                </div>
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gold-dim text-gold-300 border border-gold-border"
+                >
+                  Admin Privilege
+                </span>
+              </div>
+
+              <div
+                class="branding-grid grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
+              >
+                <!-- Part 1: Dynamic Website Name -->
+                <div
+                  class="branding-col-name lg:col-span-5 space-y-4 bg-navy-700/60 border border-navy-border/60 rounded-xl p-4 sm:p-5"
+                >
+                  <div>
+                    <label
+                      class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                      for="settingWebsiteName"
+                    >
+                      Website / Brand Name <span class="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="settingWebsiteName"
+                      value="RAVO HOUSE"
+                      placeholder="e.g. House or RAVO HOUSE"
+                      class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm font-medium transition-all"
+                    />
+                    <p
+                      class="text-[11px] text-slate-400 mt-1.5 leading-relaxed"
+                    >
+                      Example: Change
+                      <span class="text-gold-300 font-mono">RAVO HOUSE</span>
+                      &rarr; <span class="text-gold-300 font-mono">House</span>.
+                      The change persists after page refresh and browser
+                      restart.
+                    </p>
+                  </div>
+
+                  <div class="pt-2">
+                    <button
+                      type="button"
+                      id="btnSaveWebsiteName"
+                      onclick="App.saveWebsiteName()"
+                      class="inline-flex items-center justify-center gap-2 font-semibold px-4 py-2.5 rounded-lg text-xs bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer w-full sm:w-auto"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Part 2: Logo Upload & Management -->
+                <div
+                  class="branding-col-logo lg:col-span-7 space-y-4 bg-navy-700/60 border border-navy-border/60 rounded-xl p-4 sm:p-5"
+                >
+                  <div class="flex items-center justify-between">
+                    <span
+                      class="block text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                    >
+                      Official Brand Logo
+                    </span>
+                    <span
+                      id="logoStatusBadge"
+                      class="px-2 py-0.5 rounded text-[10px] font-semibold bg-navy-700 text-slate-300 border border-navy-border"
+                    >
+                      Default Logo
+                    </span>
+                  </div>
+
+                  <!-- Preview Box & File Controls -->
+                  <div
+                    class="flex flex-col sm:flex-row items-center sm:items-start gap-5"
+                  >
+                    <!-- Preserved Aspect Ratio Logo Container -->
+                    <div
+                      class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-xl bg-navy-900 border-2 border-dashed border-gold-border/60 flex items-center justify-center p-2.5 overflow-hidden group shrink-0 shadow-inner"
+                    >
+                      <img
+                        id="settingLogoPreviewImg"
+                        src="src/image/logo.png"
+                        alt="Logo Preview"
+                        class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div
+                        id="logoPreviewOverlayBadge"
+                        class="absolute bottom-1.5 inset-x-1.5 text-center bg-navy-950/80 backdrop-blur-sm text-[9px] text-gold-300 py-0.5 rounded border border-gold-border/40 font-mono truncate"
+                      >
+                        Aspect Ratio Kept
+                      </div>
+                    </div>
+
+                    <!-- Upload Actions & Direct URL -->
+                    <div class="flex-1 min-w-0 w-full space-y-3">
+                      <div>
+                        <input
+                          type="file"
+                          id="settingLogoFileInput"
+                          accept=".png,.jpg,.jpeg,.webp,.svg,image/png,image/jpeg,image/webp,image/svg+xml"
+                          class="hidden"
+                          onchange="App.handleLogoFileSelect(event)"
+                        />
+                        <button
+                          type="button"
+                          onclick="
+                            document
+                              .getElementById('settingLogoFileInput')
+                              .click()
+                          "
+                          class="inline-flex items-center justify-center gap-2 font-semibold px-3.5 py-2 rounded-lg text-xs bg-navy-600 hover:bg-navy-500 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all cursor-pointer w-full"
+                        >
+                          <svg
+                            class="w-4 h-4 text-gold-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          Upload Logo From Computer
+                        </button>
+                        <div
+                          id="logoUploadFileInfo"
+                          class="text-[11px] text-slate-400 mt-1 flex justify-between"
+                        >
+                          <span>Formats: PNG, JPG, WEBP, SVG</span>
+                          <span>Max: 2MB</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-[11px] text-slate-400 mb-1"
+                          for="settingLogoUrlInput"
+                        >
+                          Or enter direct Image URL (Cloudinary / CDN):
+                        </label>
+                        <input
+                          type="url"
+                          id="settingLogoUrlInput"
+                          placeholder="https://res.cloudinary.com/.../logo.png"
+                          class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3 py-1.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-gold-500/20 text-xs transition-all"
+                          oninput="App.handleLogoUrlInput(event)"
+                        />
+                      </div>
+
+                      <!-- Buttons: Save Logo & Remove Logo -->
+                      <div class="flex flex-wrap items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          id="btnSaveLogo"
+                          onclick="App.saveLogo()"
+                          class="inline-flex items-center gap-1.5 font-semibold px-3.5 py-2 rounded-lg text-xs bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 transition-all cursor-pointer"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                            />
+                          </svg>
+                          Save Logo
+                        </button>
+                        <button
+                          type="button"
+                          id="btnRemoveLogo"
+                          onclick="App.removeLogo()"
+                          class="inline-flex items-center gap-1.5 font-semibold px-3 py-2 rounded-lg text-xs bg-navy-700 hover:bg-rose-600/30 text-rose-300 hover:text-white border border-rose-500/30 transition-all cursor-pointer"
+                        >
+                          <svg
+                            class="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                          Remove Logo
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Backend API Connection Card -->
+            <div
+              class="bg-navy-800 border border-navy-border rounded-xl p-5 sm:p-6 shadow-card space-y-4"
+            >
+              <h3 class="font-serif text-lg font-bold text-gold-100">
+                Google Apps Script Backend API
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Connect your published Google Apps Script Web App URL to persist
+                all data directly into Google Sheets.
+              </p>
+
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  for="settingApiUrl"
+                  >Apps Script Web App URL
+                  <span class="text-rose-400">*</span></label
+                >
+                <input
+                  type="url"
+                  id="settingApiUrl"
+                  value="https://script.google.com/macros/s/AKfycbxJyen7LVudk_XdQBVnNZuqWeG-PZnNzZK2hW0zn5ItYWN_suEnLgPDpzFL2aTGVWY/exec"
+                  placeholder="https://script.google.com/macros/s/.../exec"
+                  class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                />
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  onclick="App.testBackendConnection()"
+                  class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all cursor-pointer"
+                >
+                  Test Connection
+                </button>
+                <button
+                  onclick="App.openSetupGuideModal()"
+                  class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-navy-600 hover:bg-navy-700 text-slate-200 border border-navy-border hover:border-gold-border hover:text-gold-100 transition-all cursor-pointer"
+                >
+                  Deployment Instructions
+                </button>
+              </div>
+            </div>
+
+            <!-- Delivery Charge Configuration -->
+            <div
+              class="bg-navy-800 border border-navy-border rounded-xl p-5 sm:p-6 shadow-card space-y-4"
+            >
+              <h3 class="font-serif text-lg font-bold text-gold-100">
+                Delivery Charge Rates (BDT ৳)
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Configure standard courier rates for automated memo
+                calculations.
+              </p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                    for="settingInsideDhaka"
+                    >Inside Dhaka (৳)</label
+                  >
+                  <input
+                    type="number"
+                    id="settingInsideDhaka"
+                    value="60"
+                    class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                    for="settingOutsideDhaka"
+                    >Outside Dhaka (৳)</label
+                  >
+                  <input
+                    type="number"
+                    id="settingOutsideDhaka"
+                    value="130"
+                    class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  for="settingMemoPrefix"
+                  >Memo Prefix</label
+                >
+                <input
+                  type="text"
+                  id="settingMemoPrefix"
+                  value="RH"
+                  class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Business Profile for Invoices -->
+            <div
+              class="bg-navy-800 border border-navy-border rounded-xl p-5 sm:p-6 shadow-card space-y-4"
+            >
+              <h3 class="font-serif text-lg font-bold text-gold-100">
+                <span data-branding="name">RAVO HOUSE</span> Store Profile
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Business details printed on official customer invoices.
+              </p>
+
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  for="settingShopName"
+                  >Business Name</label
+                >
+                <input
+                  type="text"
+                  id="settingShopName"
+                  value="RAVO HOUSE"
+                  class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  for="settingShopPhone"
+                  >Official Hotline / WhatsApp</label
+                >
+                <input
+                  type="text"
+                  id="settingShopPhone"
+                  value="+880 1711-000000"
+                  class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  for="settingShopAddress"
+                  >Office / Hub Address</label
+                >
+                <input
+                  type="text"
+                  id="settingShopAddress"
+                  value="Gulshan 2, Dhaka - 1212, Bangladesh"
+                  class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Invoice Customization -->
+            <div
+              class="bg-navy-800 border border-navy-border rounded-xl p-5 sm:p-6 shadow-card space-y-4"
+            >
+              <h3 class="font-serif text-lg font-bold text-gold-100">
+                Invoice Terms & Footer
+              </h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Terms, exchange policies, or signature notes displayed on
+                printed memos.
+              </p>
+
+              <div>
+                <label
+                  class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  for="settingInvoiceFooter"
+                  >Footer Note / Policy</label
+                >
+                <textarea
+                  id="settingInvoiceFooter"
+                  rows="3"
+                  class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+                >
+Thank you for your patronage with RAVO HOUSE. Please check your items in front of the delivery courier.</textarea
+                >
+              </div>
+
+              <div class="pt-4 border-t border-navy-border">
+                <button
+                  onclick="App.resetToSeedData()"
+                  class="inline-flex items-center gap-1.5 font-semibold px-3 py-1.5 rounded-lg text-xs bg-rose-500/15 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-all cursor-pointer"
+                >
+                  Load Default Sample Data
+                </button>
+              </div>
+            </div>
+
+            <!-- Account Security & Password -->
+            <div
+              class="bg-navy-800 border border-navy-border rounded-xl p-5 sm:p-6 shadow-card space-y-4"
+            >
+              <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+              >
+                <div>
+                  <h3
+                    class="font-serif text-lg font-bold text-gold-100 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-5 h-5 text-gold-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                    Account Security & Password
+                  </h3>
+                  <p class="text-xs text-slate-400 leading-relaxed mt-1">
+                    Update your personal login password for secure access to the
+                    dashboard.
+                  </p>
+                </div>
+                <button
+                  onclick="App.openChangePasswordModal()"
+                  class="inline-flex items-center gap-2 font-semibold px-4 py-2 rounded-lg text-xs bg-gold-500/15 hover:bg-gold-500 text-gold-300 hover:text-navy-950 border border-gold-500/40 transition-all cursor-pointer shadow-sm w-fit"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                    />
+                  </svg>
+                  Change Password
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- =======================================================================
+       MODAL: ADD / EDIT PRODUCT
+       ======================================================================= -->
+    <div
+      id="productModal"
+      class="modal-overlay fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden [&.open]:flex"
+    >
+      <div
+        class="w-full max-w-lg bg-navy-800 border border-gold-border rounded-2xl shadow-modal overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-navy-border"
+        >
+          <h3
+            id="productModalTitle"
+            class="font-serif text-lg font-bold text-gold-100"
+          >
+            Add New Product
+          </h3>
+          <button
+            onclick="App.closeProductModal()"
+            class="text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+          <input type="hidden" id="prodFormId" />
+
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="prodFormName"
+              >Product Name <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="text"
+              id="prodFormName"
+              placeholder="e.g. Signature Oud Extrait 50ml"
+              required
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                for="prodFormCategory"
+                >Category <span class="text-rose-400">*</span></label
+              >
+              <select
+                id="prodFormCategory"
+                required
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 focus:outline-none text-sm transition-all"
+              >
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                for="prodFormStock"
+                >Available Stock</label
+              >
+              <input
+                type="number"
+                id="prodFormStock"
+                value="20"
+                min="0"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 focus:outline-none text-sm transition-all"
+              />
+            </div>
+          </div>
+
+          <!-- Product Description Input -->
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="prodFormDescription"
+              >Product Description (Optional)</label
+            >
+            <textarea
+              id="prodFormDescription"
+              rows="3"
+              placeholder="e.g. Luxurious notes of Cambodian agarwood, amber, and Madagascar vanilla extrait. Includes premium packaging."
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all resize-y min-h-[70px]"
+            ></textarea>
+            <span class="text-[11px] text-slate-500 mt-1 block"
+              >Detailed product description or specs. This can be copied
+              directly from the product card.</span
+            >
+          </div>
+
+          <!-- Cloudinary Image URL Input with Live Preview -->
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="prodFormImageUrl"
+              >Cloudinary Image URL <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="url"
+              id="prodFormImageUrl"
+              placeholder="https://res.cloudinary.com/... or web image URL"
+              oninput="App.previewProductImage()"
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+            <span class="text-[11px] text-slate-500 mt-1 block"
+              >Paste any Cloudinary image direct link or web image URL.</span
+            >
+
+            <div
+              id="prodImagePreviewContainer"
+              class="mt-2 w-full h-36 bg-navy-700 border border-navy-border rounded-lg overflow-hidden flex items-center justify-center relative"
+            >
+              <img
+                src=""
+                alt="Product Preview"
+                id="prodImagePreview"
+                class="w-full h-full object-cover hidden"
+              />
+              <div
+                id="prodImagePlaceholder"
+                class="flex flex-col items-center justify-center text-slate-500 gap-1 text-xs"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                  />
+                </svg>
+                <span>Image Preview</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial Breakdown (Purchase, Packaging, Selling) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                for="prodFormPurchasePrice"
+                >Purchase Price (৳) <span class="text-rose-400">*</span></label
+              >
+              <input
+                type="number"
+                id="prodFormPurchasePrice"
+                placeholder="0"
+                min="0"
+                oninput="App.recalculateProductModalProfit()"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                for="prodFormPackagingCost"
+                >Packaging Cost (৳)</label
+              >
+              <input
+                type="number"
+                id="prodFormPackagingCost"
+                placeholder="0"
+                min="0"
+                oninput="App.recalculateProductModalProfit()"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="prodFormSellingPrice"
+              >Selling Price (৳) <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="number"
+              id="prodFormSellingPrice"
+              placeholder="0"
+              min="0"
+              oninput="App.recalculateProductModalProfit()"
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+
+          <!-- Automatic Profit & Margin Preview Card -->
+          <div
+            class="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl grid grid-cols-2 gap-4 text-xs"
+          >
+            <div>
+              <span class="text-slate-400 block mb-0.5"
+                >Calculated Profit per Unit</span
+              >
+              <span
+                id="prodModalProfitDisplay"
+                class="font-bold text-sm text-emerald-300"
+                >৳ 0</span
+              >
+            </div>
+            <div>
+              <span class="text-slate-400 block mb-0.5">Profit Margin %</span>
+              <span
+                id="prodModalMarginDisplay"
+                class="font-bold text-sm text-emerald-300"
+                >0.0%</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end gap-3 px-6 py-4 bg-navy-850 border-t border-navy-border"
+        >
+          <button
+            onclick="App.closeProductModal()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-navy-700 hover:bg-navy-600 text-slate-300 border border-navy-border transition-all cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="App.saveProduct()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm transition-all cursor-pointer"
+          >
+            Save Product
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+       MODAL: CATEGORY (ADD / EDIT)
+       ======================================================================= -->
+    <div
+      id="categoryModal"
+      class="modal-overlay fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden [&.open]:flex"
+    >
+      <div
+        class="w-full max-w-md bg-navy-800 border border-gold-border rounded-2xl shadow-modal overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-navy-border"
+        >
+          <h3
+            id="categoryModalTitle"
+            class="font-serif text-lg font-bold text-gold-100"
+          >
+            Add New Category
+          </h3>
+          <button
+            onclick="App.closeCategoryModal()"
+            class="text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="catFormName"
+              >Category Name <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="text"
+              id="catFormName"
+              placeholder="e.g. Fragrances, Watches, Leather"
+              required
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="catFormDesc"
+              >Description (Optional)</label
+            >
+            <textarea
+              id="catFormDesc"
+              rows="2"
+              placeholder="Brief category description"
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            ></textarea>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end gap-3 px-6 py-4 bg-navy-850 border-t border-navy-border"
+        >
+          <button
+            onclick="App.closeCategoryModal()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-navy-700 hover:bg-navy-600 text-slate-300 border border-navy-border transition-all cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="App.saveCategory()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm transition-all cursor-pointer"
+          >
+            Save Category
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+       MODAL: TEAM MEMBER (ADMIN ONLY)
+       ======================================================================= -->
+    <div
+      id="teamModal"
+      class="modal-overlay fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden [&.open]:flex"
+    >
+      <div
+        class="w-full max-w-md bg-navy-800 border border-gold-border rounded-2xl shadow-modal overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-navy-border"
+        >
+          <h3 class="font-serif text-lg font-bold text-gold-100">
+            Add Team Member
+          </h3>
+          <button
+            onclick="App.closeTeamModal()"
+            class="text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="teamFormName"
+              >Full Name <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="text"
+              id="teamFormName"
+              placeholder="e.g. Shakil Ahmed"
+              required
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="teamFormEmail"
+              >Email Address <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="email"
+              id="teamFormEmail"
+              placeholder="user@ravohouse.com"
+              required
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="teamFormPassword"
+              >Password <span class="text-rose-400">*</span></label
+            >
+            <input
+              type="password"
+              id="teamFormPassword"
+              placeholder="Minimum 6 characters"
+              required
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="teamFormRole"
+              >Role Permission</label
+            >
+            <select
+              id="teamFormRole"
+              class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 text-slate-100 focus:outline-none text-sm transition-all"
+            >
+              <option value="staff">
+                Sales Staff (Create memos & view catalog)
+              </option>
+              <option value="admin">
+                Administrator (Full catalog, profits, team & settings)
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end gap-3 px-6 py-4 bg-navy-850 border-t border-navy-border"
+        >
+          <button
+            onclick="App.closeTeamModal()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-navy-700 hover:bg-navy-600 text-slate-300 border border-navy-border transition-all cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onclick="App.saveTeamMember()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm transition-all cursor-pointer"
+          >
+            Add Member
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+       MODAL: CHANGE PASSWORD
+       ======================================================================= -->
+    <div
+      id="changePasswordModal"
+      class="modal-overlay fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden [&.open]:flex"
+    >
+      <div
+        class="w-full max-w-md bg-navy-800 border border-gold-border rounded-2xl shadow-modal overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-navy-border"
+        >
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-8 h-8 rounded-lg bg-gold-500/15 border border-gold-500/30 flex items-center justify-center text-gold-400"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3
+                class="font-serif text-lg font-bold text-gold-100 leading-tight"
+              >
+                Change Password
+              </h3>
+              <p
+                id="changePassTargetSubtitle"
+                class="text-xs text-slate-400 mt-0.5"
+              >
+                Update account password
+              </p>
+            </div>
+          </div>
+          <button
+            onclick="App.closeChangePasswordModal()"
+            class="text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <form
+          onsubmit="
+            event.preventDefault();
+            App.submitChangePassword();
+          "
+          class="p-6 space-y-4"
+        >
+          <input type="hidden" id="changePassTargetUserId" />
+          <input type="hidden" id="changePassTargetEmail" />
+
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="changePassNew"
+              >New Password <span class="text-rose-400">*</span></label
+            >
+            <div class="relative">
+              <input
+                type="password"
+                id="changePassNew"
+                placeholder="Minimum 6 characters"
+                required
+                minlength="6"
+                autocomplete="new-password"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 pr-10 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+              />
+              <button
+                type="button"
+                onclick="App.togglePasswordVisibility('changePassNew', this)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
+                title="Toggle visibility"
+              >
+                <svg
+                  class="w-4 h-4 eye-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+              for="changePassConfirm"
+              >Confirm New Password <span class="text-rose-400">*</span></label
+            >
+            <div class="relative">
+              <input
+                type="password"
+                id="changePassConfirm"
+                placeholder="Re-type new password"
+                required
+                minlength="6"
+                autocomplete="new-password"
+                class="w-full bg-navy-700 border border-navy-border focus:border-gold-500 rounded-lg px-3.5 py-2.5 pr-10 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20 text-sm transition-all"
+              />
+              <button
+                type="button"
+                onclick="
+                  App.togglePasswordVisibility('changePassConfirm', this)
+                "
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
+                title="Toggle visibility"
+              >
+                <svg
+                  class="w-4 h-4 eye-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4 border-t border-navy-border">
+            <button
+              type="button"
+              onclick="App.closeChangePasswordModal()"
+              class="px-4 py-2 rounded-lg font-semibold text-sm bg-navy-700 hover:bg-navy-600 text-slate-300 border border-navy-border transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              id="changePassSubmitBtn"
+              class="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm transition-all cursor-pointer"
+            >
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+       MODAL: MEMO DETAILS & PREVIEW
+       ======================================================================= -->
+    <div
+      id="memoDetailsModal"
+      class="modal-overlay fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden [&.open]:flex"
+    >
+      <div
+        class="w-full max-w-2xl bg-navy-800 border border-gold-border rounded-2xl shadow-modal overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-navy-border"
+        >
+          <h3
+            id="memoDetailsModalTitle"
+            class="font-serif text-lg font-bold text-gold-100"
+          >
+            Order Memo Details
+          </h3>
+          <button
+            onclick="App.closeMemoDetailsModal()"
+            class="text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div
+          id="memoDetailsModalContent"
+          class="p-6 space-y-4 max-h-[75vh] overflow-y-auto"
+        >
+          <!-- Populated dynamically -->
+        </div>
+
+        <div
+          class="flex flex-wrap justify-end gap-3 px-6 py-4 bg-navy-850 border-t border-navy-border"
+        >
+          <button
+            onclick="App.closeMemoDetailsModal()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-navy-700 hover:bg-navy-600 text-slate-300 border border-navy-border transition-all cursor-pointer"
+          >
+            Close
+          </button>
+          <button
+            id="btnDetailsCopy"
+            type="button"
+            onclick="App.copyActiveMemo()"
+            class="inline-flex items-center gap-1.5 font-semibold px-4 py-2 rounded-lg text-sm bg-transparent hover:bg-gold-dim text-gold-500 hover:text-gold-200 border border-gold-border hover:border-gold-500 transition-all cursor-pointer"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+            Copy Memo
+          </button>
+          <button
+            id="btnDetailsPrint"
+            onclick="App.printActiveMemo()"
+            class="inline-flex items-center gap-1.5 font-semibold px-4 py-2 rounded-lg text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm transition-all cursor-pointer"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6.72 13.829c-.24-1.056-.37-2.16-.37-3.294 0-4.664 3.42-8.47 7.747-8.535 4.34-.065 7.903 3.68 7.903 8.355 0 1.157-.135 2.284-.383 3.363M6.72 13.829a8.96 8.96 0 00-2.22 5.671h14.998c-.463-2.062-1.378-3.93-2.617-5.463M6.72 13.829L9 16.5m0 0l3-3m-3 3l-3-3m12 0l-3 3m3-3l3 3"
+              />
+            </svg>
+            Print Invoice
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+       MODAL: SETUP & DEPLOYMENT GUIDE
+       ======================================================================= -->
+    <div
+      id="setupGuideModal"
+      class="modal-overlay fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 items-center justify-center p-4 hidden [&.open]:flex"
+    >
+      <div
+        class="w-full max-w-2xl bg-navy-800 border border-gold-border rounded-2xl shadow-modal overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-navy-border"
+        >
+          <h3 class="font-serif text-lg font-bold text-gold-100">
+            Google Sheets & Apps Script Setup
+          </h3>
+          <button
+            onclick="App.closeSetupGuideModal()"
+            class="text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div
+          class="p-6 space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed max-h-[75vh] overflow-y-auto"
+        >
+          <p class="text-slate-100 font-medium">
+            Follow these 4 simple steps to connect this website to your personal
+            Google Sheets database:
+          </p>
+
+          <ol class="space-y-3 pl-4 list-decimal marker:text-gold-400">
+            <li>
+              <strong class="text-gold-200"
+                >Step 1: Create a Google Spreadsheet</strong
+              ><br />
+              Go to
+              <a
+                href="https://sheets.google.com"
+                target="_blank"
+                class="text-gold-500 underline underline-offset-2"
+                >sheets.google.com</a
+              >, create a new spreadsheet named
+              <code class="bg-navy-900 px-1.5 py-0.5 rounded text-gold-300"
+                >RAVO HOUSE Database</code
+              >.
+            </li>
+            <li>
+              <strong class="text-gold-200">Step 2: Open Apps Script</strong
+              ><br />
+              Inside your spreadsheet, click
+              <strong class="text-slate-100">Extensions &gt; Apps Script</strong
+              >.
+            </li>
+            <li>
+              <strong class="text-gold-200">Step 3: Copy Backend Code</strong
+              ><br />
+              Replace any existing code in
+              <code class="bg-navy-900 px-1.5 py-0.5 rounded text-gold-300"
+                >Code.gs</code
+              >
+              with the code inside the project folder
+              <code class="bg-navy-900 px-1.5 py-0.5 rounded text-gold-300"
+                >backend/Code.gs</code
+              >. Run
+              <code class="bg-navy-900 px-1.5 py-0.5 rounded text-gold-300"
+                >setupDatabase()</code
+              >
+              once to create all sheets.
+            </li>
+            <li>
+              <strong class="text-gold-200">Step 4: Deploy as Web App</strong
+              ><br />
+              Click
+              <strong class="text-slate-100"
+                >Deploy &gt; New deployment &gt; Web app</strong
+              >.<br />
+              &bull; Execute as: <strong>Me</strong><br />
+              &bull; Who has access: <strong>Anyone</strong> (crucial for web
+              access)<br />
+              Copy the generated <strong>Web App URL</strong> and paste it in
+              the <strong>Settings</strong> tab!
+            </li>
+          </ol>
+
+          <div
+            class="bg-navy-700/80 border border-gold-border/40 rounded-xl p-4"
+          >
+            <strong class="text-gold-500 block mb-1"
+              >GitHub Pages Hosting:</strong
+            >
+            <p class="text-xs text-slate-300 leading-normal">
+              Commit and push these files to a GitHub repository, go to
+              <strong>Settings &gt; Pages &gt; Branch: main</strong>, and your
+              website will be live in 60 seconds!
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end gap-3 px-6 py-4 bg-navy-850 border-t border-navy-border"
+        >
+          <button
+            onclick="App.closeSetupGuideModal()"
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-navy-700 hover:bg-navy-600 text-slate-300 border border-navy-border transition-all cursor-pointer"
+          >
+            Got It
+          </button>
+          <button
+            onclick="
+              App.closeSetupGuideModal();
+              App.navigateTo('settings');
+            "
+            class="px-4 py-2 rounded-lg font-semibold text-sm bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-500 text-navy-950 shadow-gold-sm transition-all cursor-pointer"
+          >
+            Go to Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+       OFFICIAL CUSTOMER INVOICE PRINT CANVAS
+       (Visible only during window.print())
+       ======================================================================= -->
+    <div id="printInvoiceArea" class="hidden">
+      <!-- Populated dynamically right before print -->
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div
+      id="toastContainer"
+      class="fixed bottom-5 right-5 z-[10000] flex flex-col gap-2.5 max-w-md pointer-events-none"
+    ></div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+  </body>
+</html>

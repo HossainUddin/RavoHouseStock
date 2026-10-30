@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy-900 text-slate-100 font-sans min-h-screen antialiased selection:bg-gold-500 selection:text-navy-950;
+    background-image: 
+      radial-gradient(circle at 10% 15%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 85%, rgba(30, 41, 59, 0.4) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+/* Print Invoice Rules */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 10mm 10mm 10mm;
+  }
+
+  html, body {
+    background: #FFF !important;
+    color: #111 !important;
+    font-size: 11pt;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body > :not(#printInvoiceArea),
+  #appMainContainer, #loginScreenView, .modal-overlay, #toastContainer, 
+  header, nav, main, button, .no-print {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #printInvoiceArea {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .inv-header, .inv-customer-box, .inv-totals-wrap, .inv-footer {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .inv-table {
+    page-break-inside: auto;
+  }
+
+  .inv-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+/* Custom Form Select Dark Mode Defaults */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #0F172A;
+  color: #F1F5F9;
+}
+
+/* Branding Section Grid - Guaranteed Responsive Layout */
+.branding-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .branding-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+.branding-col-name,
+.branding-col-logo {
+  min-width: 0;
+  width: 100%;
+}
+
+

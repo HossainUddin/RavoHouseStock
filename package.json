@@ -1,0 +1,20 @@
+{
+  "name": "ravo",
+  "version": "1.0.0",
+  "description": "An exclusive, high-performance web application designed for **RAVO HOUSE**, an upscale business operating in **Bangladesh**. Built with a **Deep Midnight Navy (`#0F172A`)** and **Champagne Gold (`#D4AF37`)** luxury minimalist aesthetic, this portal integrates **Google Sheets** as a cloud database and **Google Apps Script** as a serverless REST backend.",
+  "main": "script.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build": "npm run build:css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.30",
+    "tailwindcss": "^3.4.17"
+  }
+}
